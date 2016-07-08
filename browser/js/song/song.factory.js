@@ -2,19 +2,24 @@
 
 juke.factory('SongFactory', function ($http, $log) {
 
-  return {
-    convert: function (song) {
+ 	var SongFactory = {};
+
+    SongFactory.convert = function (song) {
       song.audioUrl = '/api/songs/' + song.id + '/audio';
       return song;
-    },
-
-    getData: function (res) { return res.data; },
-
-    fetchAllSongs: function(){
-    	return $http.get('/api/songs/')
-    	.then(this.getData);
     }
 
-  };
+
+    SongFactory.fetchAllSongs = function(){
+    	return $http.get('/api/songs/')
+    	.then(function(response){
+    		return response.data;
+    	})
+    	.then(function(songs){
+    		return songs.map(SongFactory.convert);
+    	});
+    	}
+
+  return SongFactory;
 
 });

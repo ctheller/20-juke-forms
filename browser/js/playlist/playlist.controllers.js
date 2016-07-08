@@ -6,7 +6,6 @@ juke.controller('newPlaylistCtrl', function ($scope, PlaylistFactory, $state) {
   	if ($scope.newPlaylistForm.$invalid) return;
   	PlaylistFactory.create($scope.newPlaylist.name)
   	.then(function(result){
-  		console.log($scope.newPlaylistForm);
   		$scope.submittedPlaylist = result;
   		$scope.newPlaylist.name = '';
   		$state.go('singlePlaylist', {id: result.id});
@@ -15,7 +14,7 @@ juke.controller('newPlaylistCtrl', function ($scope, PlaylistFactory, $state) {
 
 });
 
-juke.controller('singlePlaylistCtrl', function ($scope, $log, PlaylistFactory, SongFactory, $stateParams) {
+juke.controller('singlePlaylistCtrl', function ($scope, $log, PlaylistFactory, SongFactory, $stateParams, PlayerFactory) {
 	
 	PlaylistFactory.getPlaylistById($stateParams.id)
 	.then(function(playlist){
@@ -26,7 +25,11 @@ juke.controller('singlePlaylistCtrl', function ($scope, $log, PlaylistFactory, S
 	$scope.submit = function(){
 		if (!$scope.selectedSong) return;
 		console.log("submitted!");
-		
+		PlaylistFactory.addSong($scope.playlist, $scope.selectedSong)
+		.then(function(newSong){
+			$scope.playlist.songs.push(newSong);
+		});
+		$scope.selectedSong = null;
 	};
 		//adds new song to playlist. Uses playlist factory to do so.
 	
@@ -36,5 +39,22 @@ juke.controller('singlePlaylistCtrl', function ($scope, $log, PlaylistFactory, S
 	})
 	.catch($log.error);
 	
+	$scope.toggle = function (song) {
+    if (song !== PlayerFactory.getCurrentSong()) {
+      PlayerFactory.start(song, $scope.playlist.songs);
+    } else if ( PlayerFactory.isPlaying() ) {
+      PlayerFactory.pause();
+    } else {
+      PlayerFactory.resume();
+    }
+  };
+
+  $scope.getCurrentSong = function () {
+    return PlayerFactory.getCurrentSong();
+  };
+
+  $scope.isPlaying = function (song) {
+    return PlayerFactory.isPlaying() && PlayerFactory.getCurrentSong() === song;
+  };
 
 });
