@@ -61,6 +61,7 @@ router.post('/:playlistId/songs', function (req, res, next) {
 });
 
 router.get('/:playlistId/songs/:songId', function (req, res) {
+  console.log(req);
   const requestedSong = req.playlist.songs.find(function (song) {
     return song.id === Number(req.params.songId);
   });
@@ -69,6 +70,7 @@ router.get('/:playlistId/songs/:songId', function (req, res) {
 });
 
 router.delete('/:playlistId/songs/:songId', function (req, res, next) {
+
   req.playlist.removeSong(req.params.songId)
   .then(() => res.sendStatus(204))
   .catch(next);

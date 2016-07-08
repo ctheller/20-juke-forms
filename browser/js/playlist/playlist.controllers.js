@@ -33,6 +33,15 @@ juke.controller('singlePlaylistCtrl', function ($scope, $log, PlaylistFactory, S
 	};
 		//adds new song to playlist. Uses playlist factory to do so.
 	
+
+	$scope.removeSong = function(song){
+		PlaylistFactory.removeSong($scope.playlist, song)
+		.then(function(response){
+			var index = $scope.playlist.songs.indexOf(song);
+			$scope.playlist.songs.splice(index, 1);
+		});
+	}
+
 	SongFactory.fetchAllSongs()
 	.then(function(songs){
 		$scope.songs = songs;
